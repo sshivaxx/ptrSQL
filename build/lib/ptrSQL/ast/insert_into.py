@@ -1,16 +1,16 @@
 from typing import *
 
-from src.ptrSQL.engine.context import Context
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.engine.context import Context
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt, FromSQL
 from .comma_separated import CommaSeparated
 from .expression import Expression
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 ValueType = List[Expression]
 ValuesType = List[ValueType]

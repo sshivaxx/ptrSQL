@@ -5,7 +5,7 @@ from ..column import Column
 from ..row import Row
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 
 class TableRowSet(RowSet):

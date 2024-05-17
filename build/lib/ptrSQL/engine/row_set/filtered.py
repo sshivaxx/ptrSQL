@@ -6,7 +6,7 @@ from ..row import Row
 from ..types import *
 
 if TYPE_CHECKING:
-    from src.ptrSQL.ast.expression import Expression
+    from ptrSQL.ast.expression import Expression
 
 
 class FilteredRowSet(RowSet):

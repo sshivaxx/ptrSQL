@@ -1,7 +1,7 @@
 from typing import *
 
 if TYPE_CHECKING:
-    from src.ptrSQL.ast import Identifier, Ty
+    from ptrSQL.ast import Identifier, Ty
 
 
 class Column:

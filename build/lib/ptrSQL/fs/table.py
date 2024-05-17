@@ -1,11 +1,11 @@
 import struct
 from typing import *
 
-from src.ptrSQL.ast.column_def import ColumnDef
-from src.ptrSQL.ast.ty import *
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.tokens import Identifier
+from ptrSQL.ast.column_def import ColumnDef
+from ptrSQL.ast.ty import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import Identifier
 from .block import *
 from .block_storage import BlockStorage
 

@@ -5,12 +5,12 @@ from ..column import Column
 from ..row import Row
 
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 
 class TableRowSet(RowSet):
     """
-    Fetches row directly from the dropSQL table.
+    Fetches row directly from the src.ptrSQL table.
     """
 
     def __init__(self, table: 'fs.Table') -> None:

@@ -1,15 +1,15 @@
 from typing import *
 
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt
 from .column_def import ColumnDef
 from .existence import IfNotExists
 
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 
 class CreateTable(AstStmt):
@@ -46,32 +46,40 @@ class CreateTable(AstStmt):
             ;
         """
         # next item must be the '/create' token
-        t = tokens.next().and_then(Cast(Create))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Create))
+        if not t:
+            return IErr(t.err())
 
-        t = tokens.next().and_then(Cast(Table))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Table))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = IfNotExists.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         if_not_exists = t.ok()
 
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
-        t = tokens.next().and_then(Cast(LParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(LParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = cls.parse_columns(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         columns = t.ok()
 
-        t = tokens.next().and_then(Cast(RParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(RParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
-        t = tokens.next().and_then(Cast(Drop))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Drop))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(CreateTable(if_not_exists, table, columns))
 
@@ -87,20 +95,24 @@ class CreateTable(AstStmt):
         columns = []
 
         t = ColumnDef.from_sql(tokens)
-        if not t: return IErr(t.err())
+        if not t:
+            return IErr(t.err())
         columns.append(t.ok())
 
         # don't `next` comma yet.  maybe it is ")"
-        while tokens.peek().and_then(Cast(Comma)):
+        while tokens.peek().and_then(cast(Comma)):
             tokens.next()
-            if tokens.peek().and_then(Cast(RParen)): break
+            if tokens.peek().and_then(cast(RParen)):
+                break
 
             t = ColumnDef.from_sql(tokens)
-            if not t: return IErr(t.err().empty_to_incomplete())
+            if not t:
+                return IErr(t.err().empty_to_incomplete())
             columns.append(t.ok())
 
-        t = tokens.peek().and_then(Cast(RParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.peek().and_then(cast(RParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(columns)
 
@@ -114,7 +126,8 @@ class CreateTable(AstStmt):
 
         else:
             t = db.new_table()
-            if not t: return Err(t.err())
+            if not t:
+                return Err(t.err())
             table = t.ok()
 
             table.set_table_name(self.table)

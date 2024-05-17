@@ -1,20 +1,21 @@
 from typing import *
 
-from dropSQL.ast.comma_separated import CommaSeparated
-from dropSQL.engine.context import Context
-from dropSQL.engine.row import Row
-from dropSQL.engine.row_set import *
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.ast.comma_separated import CommaSeparated
+from ptrSQL.engine.context import Context
+from ptrSQL.engine.row import Row
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt, FromSQL
 from .expression import Expression
 from .identifier import Identifier
 from .where import WhereFromSQL
 
+
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 
 class UpdateSet(AstStmt):
@@ -57,26 +58,32 @@ class UpdateSet(AstStmt):
             ;
         """
         # next item must be the '/update' token
-        t = tokens.next().and_then(Cast(Update))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Update))
+        if not t:
+            return IErr(t.err())
 
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
-        t = tokens.next().and_then(Cast(SetKw))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(SetKw))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = CommaSeparated(Assignment, tokens).collect()
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         assign = t.ok()
 
         t = WhereFromSQL.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         where = t.ok()
 
-        t = tokens.next().and_then(Cast(Drop))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Drop))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(UpdateSet(table, assign, where))
 
@@ -92,10 +99,12 @@ class UpdateSet(AstStmt):
 
         Set of columns in 'update set' statement must be a non-strict subset of a column set of the table.
         """
-        if self.table == Identifier('autism'): return Err('Can not operate on master table')
+        if self.table == Identifier('gato'):
+            return Err('Can not operate on master table')
 
         t = db.get_table_by_name(self.table)
-        if not t: return Err(t.err())
+        if not t:
+            return Err(t.err())
         table = t.ok()
 
         rs = TableRowSet(table)
@@ -103,31 +112,36 @@ class UpdateSet(AstStmt):
             rs = FilteredRowSet(rs, self.where, args)
 
         t = self.make_transformations(rs)
-        if not t: return Err(t.err())
+        if not t:
+            return Err(t.err())
         transformation = t.ok()
 
         count = 0
         for row in rs.iter():
             r = update_row(row, transformation, args)
-            if not r: return Err(r.err())
+            if not r:
+                return Err(r.err())
             new_row = r.ok()
 
             t = table.update(new_row, row.id)
-            if not t: return Err(t.err())
+            if not t:
+                return Err(t.err())
             count += 1
 
         return Ok(count)
 
     def make_transformations(self, rs: RowSet) -> Result[List[Optional[Expression]], str]:
         assignments = dict(self.assignments)
-        if len(assignments) != len(self.assignments): return Err(f'Duplicate columns detected')
+        if len(assignments) != len(self.assignments):
+            return Err(f'Duplicate columns detected')
 
         transformation: List[Optional[Expression]] = []
         for column in rs.columns():
             transformation.append(assignments.pop(column.name, None))
 
         assert len(transformation) == len(rs.columns())
-        if len(assignments) != 0: return Err(f'Unexpected column(s): ' + ', '.join(map(str, assignments.keys())))
+        if len(assignments) != 0:
+            return Err(f'Unexpected column(s): ' + ', '.join(map(str, assignments.keys())))
 
         return Ok(transformation)
 
@@ -141,7 +155,8 @@ def update_row(row: Row, transformation: List[Optional[Expression]], args: ARGS_
 
         else:
             v = expr.eval_with(Context(row, args))
-            if not v: return Err(v.err())
+            if not v:
+                return Err(v.err())
             val = v.ok()
 
             r.append(val)
@@ -157,16 +172,20 @@ class Assignment(FromSQL[Tuple[Identifier, Expression]]):
             : /column_name "=" expr
             ;
         """
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         lvalue = t.ok()
 
-        t = tokens.next().and_then(Cast(Operator))
-        if not t: return IErr(t.err().empty_to_incomplete())
-        if t.ok().operator != Operator.EQ: return IErr(Syntax('=', str(t)))
+        t = tokens.next().and_then(cast(Operator))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
+        if t.ok().operator != Operator.EQ:
+            return IErr(Syntax('=', str(t)))
 
         t = Expression.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         e = t.ok()
 
         return IOk((lvalue, e))

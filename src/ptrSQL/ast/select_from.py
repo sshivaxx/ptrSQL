@@ -1,10 +1,9 @@
 from typing import *
-
-from dropSQL.engine.row_set import *
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedTable
 from .ast import AstStmt
 from .comma_separated import CommaSeparated
@@ -14,7 +13,7 @@ from .result_column import ResultColumn
 from .where import WhereFromSQL
 
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 
 class SelectFrom(AstStmt):

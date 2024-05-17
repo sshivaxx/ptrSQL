@@ -1,10 +1,10 @@
 from typing import *
 
-from dropSQL.ast.ast import AstStmt
-from dropSQL.generic import *
-from dropSQL.parser.streams.statements import Statements
+from ptrSQL.ast.ast import AstStmt
+from ptrSQL.generic import *
+from ptrSQL.parser.streams.statements import Statements
 from .db_file import DBFile
-from dropSQL.engine.types import *
+from ptrSQL.engine.types import *
 
 
 class Connection:

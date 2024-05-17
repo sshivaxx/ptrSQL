@@ -1,5 +1,5 @@
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import *
 from .characters import Characters
 from .stream import Stream
 

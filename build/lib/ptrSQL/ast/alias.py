@@ -1,18 +1,16 @@
 import abc
 from typing import *
 
-
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.engine.row_set import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import Ast
 from .expression import Expression
 from .identifier import Identifier
-from ..engine.row_set.rename_table import RenameTableRowSet
-from ..engine.row_set.row_set import RowSet
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 
 class Alias(Ast, metaclass=abc.ABCMeta):
@@ -30,8 +28,7 @@ class AliasedTable(Alias):
 
     def row_set(self, db: 'fs.DBFile') -> Result[RowSet, str]:
         r = db.get_row_set(self.name)
-        if not r:
-            return Err(r.err())
+        if not r: return Err(r.err())
         rs = r.ok()
 
         if self.alias is not None:
@@ -57,13 +54,12 @@ class AliasedTable(Alias):
             | /identifier
             ;
         """
-        t = tokens.next().and_then(cast(Identifier))
-        if not t:
-            return IErr(t.err())
+        t = tokens.next().and_then(Cast(Identifier))
+        if not t: return IErr(t.err())
         name = t.ok()
 
         alias = None
-        t = tokens.peek().and_then(cast(Identifier))
+        t = tokens.peek().and_then(Cast(Identifier))
         if t:
             tokens.next()
             alias = t.ok()
@@ -101,17 +97,15 @@ class AliasedExpression(Alias):
             ;
         """
         t = Expression.from_sql(tokens)
-        if not t:
-            return IErr(t.err())
+        if not t: return IErr(t.err())
         expr = t.ok()
 
         alias: Optional[Identifier] = None
-        t = tokens.peek().and_then(cast(As))
+        t = tokens.peek().and_then(Cast(As))
         if t:
             tokens.next()
-            t = tokens.next().and_then(cast(Identifier))
-            if not t:
-                return IErr(t.err().empty_to_incomplete())
+            t = tokens.next().and_then(Cast(Identifier))
+            if not t: return IErr(t.err().empty_to_incomplete())
             alias = t.ok()
 
         return IOk(AliasedExpression(expr, alias))

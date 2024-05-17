@@ -1,17 +1,17 @@
 import abc
 from typing import *
 
-from dropSQL.engine.row_set import *
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedTable
 from .ast import *
 from .expression import Expression
 
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 __all__ = [
     'JoinClausesParser',
@@ -42,7 +42,8 @@ class JoinClausesParser(FromSQL[List['JoinAst']]):
             joins.append(join.ok())
             join = JoinAst.from_sql(tokens)
 
-        if join.err().is_empty(): return IOk(joins)
+        if join.err().is_empty():
+            return IOk(joins)
         return IErr(join.err())
 
 
@@ -67,7 +68,8 @@ class JoinAst(Ast, FromSQL['JoinAst'], metaclass=abc.ABCMeta):
             ;
         """
         t = tokens.peek()
-        if not t: return IErr(t.err())
+        if not t:
+            return IErr(t.err())
         tok = t.ok()
 
         if isinstance(tok, Comma):
@@ -85,7 +87,8 @@ class CrossJoin(JoinAst, FromSQL['CrossJoin']):
 
     def join(self, lhs: RowSet, db: 'fs.DBFile', args: ARGS_TYPE = ()) -> Result[RowSet, str]:
         rhs = self.table.row_set(db)
-        if not rhs: return Err(rhs.err())
+        if not rhs:
+            return Err(rhs.err())
 
         rs = CrossJoinRowSet(lhs, rhs.ok())
 
@@ -104,11 +107,13 @@ class CrossJoin(JoinAst, FromSQL['CrossJoin']):
             : "," /aliased_table
             ;
         """
-        t = tokens.next().and_then(Cast(Comma))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Comma))
+        if not t:
+            return IErr(t.err())
 
         t = AliasedTable.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
         return IOk(CrossJoin(table))
@@ -122,7 +127,8 @@ class InnerJoin(CrossJoin, FromSQL['InnerJoin']):
 
     def join(self, lhs: RowSet, db: 'fs.DBFile', args: ARGS_TYPE = ()) -> Result[RowSet, str]:
         r = self.table.row_set(db)
-        if not r: return Err(r.err())
+        if not r:
+            return Err(r.err())
         rhs = r.ok()
 
         return Ok(InnerJoinRowSet(lhs, rhs, self.constraint, args))
@@ -144,18 +150,22 @@ class InnerJoin(CrossJoin, FromSQL['InnerJoin']):
             : "/join" /aliased_table "/on" expr
             ;
         """
-        t = tokens.next().and_then(Cast(Join))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Join))
+        if not t:
+            return IErr(t.err())
 
         t = AliasedTable.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
-        t = tokens.next().and_then(Cast(On))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(On))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = Expression.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         constraint = t.ok()
 
         return IOk(InnerJoin(table, constraint))

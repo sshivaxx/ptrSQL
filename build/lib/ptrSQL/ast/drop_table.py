@@ -1,9 +1,9 @@
 from typing import *
 
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt
 from .existence import IfExists
 
@@ -60,7 +60,7 @@ class DropTable(AstStmt):
         return IOk(DropTable(if_exists, table))
 
     def execute(self, db, args: ARGS_TYPE = ()) -> Result[bool, None]:
-        from src.ptrSQL.fs import DBFile
+        from ptrSQL.fs import DBFile
         db: DBFile = db
 
         for table in db.get_tables():

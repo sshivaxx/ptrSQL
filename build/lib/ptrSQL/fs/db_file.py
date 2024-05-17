@@ -6,18 +6,16 @@ import io
 import os
 from typing import *
 
-from src.ptrSQL.ast import *
-from src.ptrSQL.engine.column import Column
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.tokens import Identifier
+from ptrSQL.ast import *
+from ptrSQL.engine.column import Column
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import Identifier
 from .block import Block, BLOCK_SIZE
 from .block_storage import BlockStorage
 from .metadata import Metadata
 from .table import Table
-from ..engine.row_set.mock import MockRowSet
-from ..engine.row_set.row_set import RowSet
-from ..engine.row_set.table import TableRowSet
 
 
 def open_db(path: str) -> io.BufferedIOBase:
@@ -34,7 +32,7 @@ def open_db(path: str) -> io.BufferedIOBase:
 class DBFile(BlockStorage):
     def __init__(self, path: str = MEMORY) -> None:
         """
-        Open /src.ptrSQL™ⓒⓡ database file stored at given `path`.
+        Open /src.ptrSQL database file stored at given `path`.
 
         A special value path, ":memory:", will open connection to a new transient in-memory database.
         """

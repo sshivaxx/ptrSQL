@@ -1,22 +1,21 @@
 from typing import *
 
-from src.ptrSQL.ast.comma_separated import CommaSeparated
-from src.ptrSQL.engine.context import Context
-from src.ptrSQL.engine.row import Row
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.ast.comma_separated import CommaSeparated
+from ptrSQL.engine.context import Context
+from ptrSQL.engine.row import Row
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt, FromSQL
 from .expression import Expression
 from .identifier import Identifier
 from .where import WhereFromSQL
-from ..engine.row_set.filtered import FilteredRowSet
-from ..engine.row_set.row_set import RowSet
-from ..engine.row_set.table import TableRowSet
+
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 
 class UpdateSet(AstStmt):

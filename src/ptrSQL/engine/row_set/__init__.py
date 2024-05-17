@@ -1,0 +1,2 @@
+class EmptyRowSet:
+    pass

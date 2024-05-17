@@ -4,13 +4,14 @@ import readline
 import subprocess
 import sys
 
-from src.ptrSQL import __version__
-from src.ptrSQL.fs import Connection
-from src.ptrSQL.fs.block import BLOCK_SIZE
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams.statements import Statements
+from ptrSQL import __version__
+from ptrSQL.engine.row_set import *
+from ptrSQL.fs import Connection
+from ptrSQL.fs.block import BLOCK_SIZE
+from ptrSQL.generic import *
+from ptrSQL.parser.streams.statements import Statements
 from .formatters import PrettyFormatter
-from ..engine.row_set.row_set import RowSet
+
 
 
 def open_file_or_memory() -> Connection:

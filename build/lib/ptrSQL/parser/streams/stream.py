@@ -1,6 +1,6 @@
 import abc
 from typing import *
-from src.ptrSQL.generic import *
+from ptrSQL.generic import *
 
 
 class Stream(Generic[T], metaclass=abc.ABCMeta):

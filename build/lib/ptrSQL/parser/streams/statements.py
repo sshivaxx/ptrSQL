@@ -1,6 +1,6 @@
-from src.ptrSQL.ast.stmt import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.ast.stmt import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import *
 from .stream import Stream
 from .tokens import Tokens
 

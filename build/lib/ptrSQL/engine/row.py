@@ -3,7 +3,7 @@ from typing import *
 from .types import *
 
 if TYPE_CHECKING:
-    from src.ptrSQL.engine.row_set.row_set import RowSet
+    from .row_set import RowSet
 
 
 class Row(collections.abc.Sequence):

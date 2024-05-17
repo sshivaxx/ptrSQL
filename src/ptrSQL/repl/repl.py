@@ -4,13 +4,14 @@ import readline
 import subprocess
 import sys
 
-from dropSQL import __version__
-from dropSQL.engine.row_set import *
-from dropSQL.fs import Connection
-from dropSQL.fs.block import BLOCK_SIZE
-from dropSQL.generic import *
-from dropSQL.parser.streams.statements import Statements
+from ptrSQL import __version__
+from ptrSQL.engine.row_set import *
+from ptrSQL.fs import Connection
+from ptrSQL.fs.block import BLOCK_SIZE
+from ptrSQL.generic import *
+from ptrSQL.parser.streams.statements import Statements
 from .formatters import PrettyFormatter
+
 
 
 def open_file_or_memory() -> Connection:
@@ -107,7 +108,7 @@ def launch():
     """
     conn = open_file_or_memory()
 
-    print(f'/dropSQL version {__version__}\n'
+    print(f'/src.ptrSQL version {__version__}\n'
           f'Enter ".help" for usage hints.\n'
           f'Connected to {conn}')
 
@@ -126,7 +127,7 @@ class DotCommand:
 
 
 HELP = """
-This is dropSQL REPL. You are connected to {conn}.
+This is src.ptrSQL REPL. You are connected to {conn}.
 Type in commands and watch the output.
 
 .help       Show this help.
@@ -167,7 +168,8 @@ class BlockDebug(DotCommand):
     @classmethod
     def execute(cls, conn: Connection, arg: str) -> None:
         r = try_int(arg)  # 'r' for 'Result'
-        if not r: return print(r.err())
+        if not r:
+            return print(r.err())
         index = r.ok()
 
         try:

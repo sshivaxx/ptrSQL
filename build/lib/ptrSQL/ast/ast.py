@@ -1,9 +1,13 @@
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.parser.streams.stream import *
-from src.ptrSQL.parser.tokens import *
+import abc
+from typing import *
+
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 __all__ = ['Ast', 'AstStmt', 'FromSQL']
 
@@ -40,7 +44,7 @@ class FromSQL(Generic[T]):
     @abc.abstractmethod
     def from_sql(cls, tokens: Stream[Token]) -> IResult[T]:
         """
-        Read /dropSQL tokens from `tokens` stream, and try to build up the result.
+        Read /ptrSQL tokens from `tokens` stream, and try to build up the result.
         Stream's next item is the first token we must work with.
         After returning `IOk`, stream must point to the last successfully processed token.
         """

@@ -1,19 +1,17 @@
 import abc
 from typing import *
 
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedTable
 from .ast import *
 from .expression import Expression
-from ..engine.row_set.join.cross import CrossJoinRowSet
-from ..engine.row_set.join.inner import InnerJoinRowSet
-from ..engine.row_set.row_set import RowSet
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 __all__ = [
     'JoinClausesParser',

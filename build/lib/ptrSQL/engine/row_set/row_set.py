@@ -1,16 +1,17 @@
 import abc
 from typing import *
-from src.ptrSQL.engine.column import Column
+
+from ..column import Column
 
 if TYPE_CHECKING:
-    from src.ptrSQL.engine.row import Row
+    from ..row import Row
 
 
 class RowSet(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def columns(self) -> List[Column]:
         """
-        Describe columns there
+        Describe columns in this row set.
         """
 
     @abc.abstractmethod

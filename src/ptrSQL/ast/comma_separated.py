@@ -1,8 +1,8 @@
 from typing import *
 
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import FromSQL
 
 
@@ -19,8 +19,9 @@ class CommaSeparated(Generic[T], Stream[T]):
             self.first = False
 
         else:
-            t = self.tokens.peek().and_then(Cast(Comma))
-            if not t: return IErr(Empty())
+            t = self.tokens.peek().and_then(cast(Comma))
+            if not t:
+                return IErr(Empty())
             self.tokens.next()
 
         return self.ty.from_sql(self.tokens)

@@ -1,8 +1,9 @@
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import Ast
 from .ty import Ty
+
 
 
 class ColumnDef(Ast):
@@ -30,16 +31,19 @@ class ColumnDef(Ast):
             ;
         """
         # the next item must be the column name
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err())
         name = t.ok()
 
         t = Ty.from_sql(tokens)
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         ty = t.ok()
 
         t = cls.parse_primary_key(tokens)
-        if not t: return Err(t.err().empty_to_incomplete())
+        if not t:
+            return Err(t.err().empty_to_incomplete())
         is_primary_key = t.ok()
 
         return IOk(ColumnDef(name, ty, is_primary_key))
@@ -53,11 +57,13 @@ class ColumnDef(Ast):
             ;
         """
         # next token MAY BE "/primary"
-        t = tokens.peek().and_then(Cast(Primary))
-        if not t: return IOk(False)
+        t = tokens.peek().and_then(cast(Primary))
+        if not t:
+            return IOk(False)
         tokens.next()
 
-        t = tokens.next().and_then(Cast(Key))
-        if not t: return IErr(t.err().empty_to_incomplete().set_expected('key'))
+        t = tokens.next().and_then(cast(Key))
+        if not t:
+            return IErr(t.err().empty_to_incomplete().set_expected('key'))
 
         return IOk(True)

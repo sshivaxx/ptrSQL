@@ -1,8 +1,9 @@
 from typing import *
-from src.ptrSQL.engine.types import *
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedTable
 from .ast import AstStmt
 from .comma_separated import CommaSeparated
@@ -10,12 +11,9 @@ from .expression import Expression
 from .join import *
 from .result_column import ResultColumn
 from .where import WhereFromSQL
-from ..engine.row_set.filtered import FilteredRowSet
-from ..engine.row_set.projection import ProjectionRowSet
-from ..engine.row_set.row_set import RowSet
 
 if TYPE_CHECKING:
-    from src.ptrSQL import fs
+    from ptrSQL import fs
 
 
 class SelectFrom(AstStmt):
@@ -60,50 +58,41 @@ class SelectFrom(AstStmt):
             ;
         """
         # next item must be the '/select' token
-        t = tokens.next().and_then(cast(Select))
-        if not t:
-            return IErr(t.err())
+        t = tokens.next().and_then(Cast(Select))
+        if not t: return IErr(t.err())
 
         t = CommaSeparated(ResultColumn, tokens).collect()
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        if not t: return IErr(t.err().empty_to_incomplete())
         columns = t.ok()
 
-        t = tokens.next().and_then(cast(From))
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(Cast(From))
+        if not t: return IErr(t.err().empty_to_incomplete())
 
         t = AliasedTable.from_sql(tokens)
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        if not t: return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
         t = JoinClausesParser.from_sql(tokens)
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        if not t: return IErr(t.err().empty_to_incomplete())
         joins = t.ok()
 
         t = WhereFromSQL.from_sql(tokens)
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        if not t: return IErr(t.err().empty_to_incomplete())
         where = t.ok()
 
-        t = tokens.next().and_then(cast(Drop))
-        if not t:
-            return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(Cast(Drop))
+        if not t: return IErr(t.err().empty_to_incomplete())
 
         return IOk(SelectFrom(columns, table, joins, where))
 
     def execute(self, db: 'fs.DBFile', args: ARGS_TYPE = ()) -> Result['RowSet', str]:
         r = self.table.row_set(db)
-        if not r:
-            return Err(r.err())
+        if not r: return Err(r.err())
         rs = r.ok()
 
         for join in self.joins:
             r = join.join(rs, db, args)
-            if not r:
-                return Err(r.err())
+            if not r: return Err(r.err())
             rs = r.ok()
 
         if self.where is not None:

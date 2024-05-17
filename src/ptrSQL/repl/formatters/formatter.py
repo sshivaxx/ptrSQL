@@ -1,11 +1,9 @@
 import abc
-from typing import *
-from typing.io import TextIO
-
-
-from dropSQL.engine.row_set import *
+from typing import TextIO
 
 __all__ = ['Formatter']
+
+from ptrSQL.engine.row_set import *
 
 
 class Formatter(metaclass=abc.ABCMeta):

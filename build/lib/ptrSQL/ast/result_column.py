@@ -1,8 +1,8 @@
 import abc
 
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedExpression
 from .ast import Ast, FromSQL
 

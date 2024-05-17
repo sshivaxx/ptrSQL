@@ -1,6 +1,6 @@
 from typing import *
 
-from src.ptrSQL.parser.tokens import Identifier
+from ptrSQL.parser.tokens import Identifier
 from .row_set import RowSet
 from ..column import Column
 from ..context import Context
@@ -8,7 +8,7 @@ from ..row import Row
 from ..types import *
 
 if TYPE_CHECKING:
-    from src.ptrSQL.ast.result_column import *
+    from ptrSQL.ast.result_column import *
 
 
 class ProjectionRowSet(RowSet):
@@ -33,7 +33,7 @@ class ProjectionRowSet(RowSet):
                     alias = aliased.expression.to_sql()
 
                 # TODO: Expression::derive_type(args) -> Result[Ty]
-                from src.ptrSQL.ast.ty import IntegerTy
+                from ptrSQL.ast.ty import IntegerTy
                 ty = IntegerTy()
                 self._columns.append(Column(Identifier(''), alias, ty))
 

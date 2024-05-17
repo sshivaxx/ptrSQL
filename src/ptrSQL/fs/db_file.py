@@ -6,12 +6,12 @@ import io
 import os
 from typing import *
 
-from dropSQL.ast import *
-from dropSQL.engine.column import Column
-from dropSQL.engine.row_set import *
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.tokens import Identifier
+from ptrSQL.ast import *
+from ptrSQL.engine.column import Column
+from ptrSQL.engine.row_set import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import Identifier
 from .block import Block, BLOCK_SIZE
 from .block_storage import BlockStorage
 from .metadata import Metadata
@@ -24,14 +24,15 @@ def open_db(path: str) -> io.BufferedIOBase:
     else:
         if not os.path.exists(path):
             # touch file
-            with open(path, "w"): pass
+            with open(path, "w"):
+                pass
         return open(path, "r+b", buffering=16 * BLOCK_SIZE)
 
 
 class DBFile(BlockStorage):
     def __init__(self, path: str = MEMORY) -> None:
         """
-        Open /dropSQL™ⓒⓡ database file stored at given `path`.
+        Open /src.ptrSQL database file stored at given `path`.
 
         A special value path, ":memory:", will open connection to a new transient in-memory database.
         """
@@ -92,7 +93,8 @@ class DBFile(BlockStorage):
 
         else:
             t = self.get_table_by_name(table_name)
-            if not t: return Err(t.err())
+            if not t:
+                return Err(t.err())
             table = t.ok()
 
             return Ok(TableRowSet(table))
@@ -145,7 +147,8 @@ class DBFile(BlockStorage):
         rows: List[List[str]] = []
         for table in self.get_tables():
             name = table.get_table_name()
-            if name.identifier == '': continue
+            if name.identifier == '':
+                continue
             sql = CreateTable(None, name, table.get_columns()).to_sql()
             rows.append(['table', name.identifier, sql])
         return MockRowSet(columns, rows)

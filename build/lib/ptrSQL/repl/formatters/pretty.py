@@ -1,15 +1,14 @@
 import os
 from typing import *
-from typing import TextIO
-
-from ...engine.row_set.row_set import RowSet
+from typing.io import TextIO
 
 try:
     TextIO
 except NameError:
-    from typing import TextIO
+    from typing.io import TextIO
 
-from src.ptrSQL.ast import ExpressionLiteral
+from ptrSQL.ast import ExpressionLiteral
+from ptrSQL.engine.row_set import *
 from .formatter import Formatter
 
 __all__ = ['PrettyFormatter']

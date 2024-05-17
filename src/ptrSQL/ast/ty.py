@@ -1,10 +1,10 @@
 import abc
 from typing import *
 
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import Ast
 from .expression import *
 
@@ -18,7 +18,7 @@ __all__ = [
 INT = b'\0\0'
 FLOAT = b'\xff\xff'
 
-LiteralTy = TypeVar('LiteralType', ExpressionLiteralInt, ExpressionLiteralFloat, ExpressionLiteralVarChar)
+LiteralTy = TypeVar('LiteralTy', ExpressionLiteralInt, ExpressionLiteralFloat, ExpressionLiteralVarChar)
 
 
 class Ty(Generic[LiteralTy], Ast, metaclass=abc.ABCMeta):
@@ -31,8 +31,9 @@ class Ty(Generic[LiteralTy], Ast, metaclass=abc.ABCMeta):
             | "varchar" "(" integer ")"
             ;
         """
-        t = tokens.peek().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().set_expected('integer, float or varchar type'))
+        t = tokens.peek().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().set_expected('integer, float or varchar type'))
 
         tok = t.ok()
 
@@ -46,7 +47,8 @@ class Ty(Generic[LiteralTy], Ast, metaclass=abc.ABCMeta):
 
         elif tok == Identifier('varchar'):
             t = VarCharTy.from_sql(tokens)
-            if not t: return IErr(t.err().empty_to_incomplete())
+            if not t:
+                return IErr(t.err().empty_to_incomplete())
             return IOk(t.ok())
 
         else:
@@ -59,7 +61,7 @@ class Ty(Generic[LiteralTy], Ast, metaclass=abc.ABCMeta):
         """
 
     ############################
-    # methods for `dropSQL.fs` #
+    # methods for `src.ptrSQL.fs` #
     ############################
 
     @abc.abstractmethod
@@ -180,17 +182,21 @@ class VarCharTy(Ty[ExpressionLiteralVarChar]):
         """
 
         # next token must be "varchar"
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t or t.ok() != Identifier('varchar'): return IErr(Syntax('varchar', str(t)))
+        t = tokens.next().and_then(cast(Identifier))
+        if not t or t.ok() != Identifier('varchar'):
+            return IErr(Syntax('varchar', str(t)))
 
-        t = tokens.next().and_then(Cast(LParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(LParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
-        t = tokens.next().and_then(Cast(Integer))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Integer))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         width = t.ok().value
 
-        t = tokens.next().and_then(Cast(RParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(RParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(VarCharTy(width))

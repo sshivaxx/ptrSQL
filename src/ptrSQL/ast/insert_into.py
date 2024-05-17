@@ -1,16 +1,16 @@
 from typing import *
 
-from dropSQL.engine.context import Context
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.engine.context import Context
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import AstStmt, FromSQL
 from .comma_separated import CommaSeparated
 from .expression import Expression
 
 if TYPE_CHECKING:
-    from dropSQL import fs
+    from ptrSQL import fs
 
 ValueType = List[Expression]
 ValuesType = List[ValueType]
@@ -59,38 +59,48 @@ class InsertInto(AstStmt, FromSQL['InsertInto']):
             ;
         """
         # next item must be the "/insert" token
-        t = tokens.next().and_then(Cast(Insert))
-        if not t: return IErr(t.err())
+        t = tokens.next().and_then(cast(Insert))
+        if not t:
+            return IErr(t.err())
 
-        t = tokens.next().and_then(Cast(Into))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Into))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         table = t.ok()
 
-        t = tokens.next().and_then(Cast(LParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(LParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = CommaSeparated(IdentFromSQL, tokens).collect()
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         columns = t.ok()
 
-        t = tokens.next().and_then(Cast(RParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(RParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
-        t = tokens.next().and_then(Cast(Values))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Values))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = CommaSeparated(ValueFromSQL, tokens).collect()
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         values = t.ok()
 
-        t = tokens.next().and_then(Cast(Drop))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Drop))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         c = count_check(len(columns), values)
-        if not c: return IErr(c.err())
+        if not c:
+            return IErr(c.err())
 
         return IOk(InsertInto(table, columns, values))
 
@@ -99,30 +109,35 @@ class InsertInto(AstStmt, FromSQL['InsertInto']):
         # 2. reorder columns in query according to table
         # 3. underlying insert
         t = db.get_table_by_name(self.table)
-        if not t: return Err(t.err())
+        if not t:
+            return Err(t.err())
         table = t.ok()
 
         t = self.transition_vector(table)
-        if not t: return Err(t.err())
+        if not t:
+            return Err(t.err())
         transition = t.ok()
 
         ctx = Context.empty()
         ctx.args = args
 
         for value in self.values:
-            if len(value) != len(self.columns): return Err('#values != number of columns')
+            if len(value) != len(self.columns):
+                return Err('#values != number of columns')
 
             row: ROW_TYPE = [None] * len(self.columns)
             for i, expr in enumerate(value):
 
                 res = expr.eval_with(ctx)
-                if not res: return Err(res.err())
+                if not res:
+                    return Err(res.err())
                 item = res.ok()
 
                 row[transition[i]] = item
 
             res = table.insert(row)
-            if not res: return Err(res.err())
+            if not res:
+                return Err(res.err())
 
         return Ok(None)
 
@@ -133,7 +148,8 @@ class InsertInto(AstStmt, FromSQL['InsertInto']):
         transitions: List[int] = []
 
         for i, column in enumerate(self.columns):
-            if column in added: return Err(f'Column {column} duplicate')
+            if column in added:
+                return Err(f'Column {column} duplicate')
 
             for j, t_column in enumerate(table_columns):
                 if column == t_column.name:
@@ -151,8 +167,9 @@ class InsertInto(AstStmt, FromSQL['InsertInto']):
 class IdentFromSQL(FromSQL[Identifier]):
     @classmethod
     def from_sql(cls, tokens: Stream[Token]) -> IResult[Identifier]:
-        t = tokens.next().and_then(Cast(Identifier))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(Identifier))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(t.ok())
 
@@ -160,14 +177,17 @@ class IdentFromSQL(FromSQL[Identifier]):
 class ValueFromSQL(FromSQL[ValueType]):
     @classmethod
     def from_sql(cls, tokens: Stream[Token]) -> IResult[ValueType]:
-        t = tokens.next().and_then(Cast(LParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(LParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         t = CommaSeparated(Expression, tokens).collect()
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
         value = t.ok()
 
-        t = tokens.next().and_then(Cast(RParen))
-        if not t: return IErr(t.err().empty_to_incomplete())
+        t = tokens.next().and_then(cast(RParen))
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         return IOk(value)

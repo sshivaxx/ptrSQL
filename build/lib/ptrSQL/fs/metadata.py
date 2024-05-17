@@ -1,4 +1,4 @@
-from src.ptrSQL.engine.types import *
+from ptrSQL.engine.types import *
 from .block import *
 from .block_storage import BlockStorage
 

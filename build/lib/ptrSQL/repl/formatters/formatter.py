@@ -3,7 +3,7 @@ from typing import TextIO
 
 __all__ = ['Formatter']
 
-from src.ptrSQL.engine.row_set.row_set import RowSet
+from ptrSQL.engine.row_set import *
 
 
 class Formatter(metaclass=abc.ABCMeta):

@@ -1,10 +1,10 @@
 from typing import *
 
-from src.ptrSQL.ast.ast import AstStmt
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams.statements import Statements
+from ptrSQL.ast.ast import AstStmt
+from ptrSQL.generic import *
+from ptrSQL.parser.streams.statements import Statements
 from .db_file import DBFile
-from src.ptrSQL.engine.types import *
+from ptrSQL.engine.types import *
 
 
 class Connection:
@@ -20,12 +20,10 @@ class Connection:
         else:
             # parse and cache a statement
             res = Statements.from_str(sql).collect()
-            if not res:
-                return IErr(res.err())
+            if not res: return IErr(res.err())
 
             stmts = res.ok()
-            if len(stmts) != 1:
-                return IErr(Syntax('one statement', f'{len(stmts)} statements'))
+            if len(stmts) != 1: return IErr(Syntax('one statement', f'{len(stmts)} statements'))
 
             stmt = stmts[0]
 

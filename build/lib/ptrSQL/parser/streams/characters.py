@@ -1,6 +1,6 @@
 from io import StringIO
 
-from src.ptrSQL.generic import *
+from ptrSQL.generic import *
 from .stream import Stream
 
 

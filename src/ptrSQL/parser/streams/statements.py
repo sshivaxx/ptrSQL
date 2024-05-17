@@ -1,6 +1,6 @@
-from dropSQL.ast.stmt import *
-from dropSQL.generic import *
-from dropSQL.parser.tokens import *
+from ptrSQL.ast.stmt import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import *
 from .stream import Stream
 from .tokens import Tokens
 
@@ -18,7 +18,8 @@ class Statements(Stream[AstStmt]):
     def next_impl(self) -> IResult[AstStmt]:
 
         t = self.tokens.peek()
-        if not t: return Err(t.err())
+        if not t:
+            return Err(t.err())
         tok = t.ok()
 
         if isinstance(tok, Create):

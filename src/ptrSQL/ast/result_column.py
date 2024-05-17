@@ -1,8 +1,8 @@
 import abc
 
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .alias import AliasedExpression
 from .ast import Ast, FromSQL
 
@@ -29,14 +29,16 @@ class ResultColumn(Ast, FromSQL['ResultColumn'], metaclass=abc.ABCMeta):
             | /aliased_expression
             ;
         """
-        t = tokens.peek().and_then(Cast(Operator))
+        t = tokens.peek().and_then(cast(Operator))
         if t:
-            if t.ok().operator != Operator.MUL: return IErr(Syntax('STAR or expression', str(t.ok())))
+            if t.ok().operator != Operator.MUL:
+                return IErr(Syntax('STAR or expression', str(t.ok())))
             tokens.next().ok()
             return IOk(ResultStar())
 
         t = AliasedExpression.from_sql(tokens)
-        if not t: return IErr(t.err())
+        if not t:
+            return IErr(t.err())
 
         return IOk(ResultExpression(t.ok()))
 

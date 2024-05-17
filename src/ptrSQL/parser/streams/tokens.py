@@ -1,5 +1,5 @@
-from src.dropSQL.generic import *
-from src.dropSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import *
 from .characters import Characters
 from .stream import Stream
 
@@ -12,7 +12,7 @@ class Tokens(Stream[Token]):
 
     @classmethod
     def from_str(cls, source: str) -> 'Tokens':
-        return Tokens(Characters.from_str(source))
+        return Tokens(Characters.from_string(source))
 
     def next_impl(self, skip_whitespace: bool = True) -> IResult[Token]:
         """
@@ -22,7 +22,8 @@ class Tokens(Stream[Token]):
         if self.characters.current().is_err() and self.characters.current().err().is_empty():
             self.characters.next()
 
-        if skip_whitespace: self.skip_whitespace()
+        if skip_whitespace:
+            self.skip_whitespace()
         if self.characters.current().is_err():
             assert self.characters.current().err().is_empty()
             return IErr(Empty())
@@ -72,8 +73,9 @@ class Tokens(Stream[Token]):
 
         elif char == '?':
             self.characters.next()
-            t = self.next_impl(False).and_then(Cast(Integer))
-            if not t: return IErr(t.err())
+            t = self.next_impl(False).and_then(cast(Integer))
+            if not t:
+                return IErr(t.err())
 
             index = t.ok()
             return IOk(Placeholder(index.value))
@@ -167,5 +169,6 @@ class Tokens(Stream[Token]):
         def not_nl(ch: str) -> bool:
             return (ch != '\n') and (ch != '\r')
 
-        while self.characters.next().map(not_nl).ok_or(False): pass
+        while self.characters.next().map(not_nl).ok_or(False):
+            pass
         return self.next_impl()

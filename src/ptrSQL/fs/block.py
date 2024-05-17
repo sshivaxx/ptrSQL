@@ -1,4 +1,4 @@
-from dropSQL.engine.types import *
+from ptrSQL.engine.types import *
 
 __all__ = [
     'Block',

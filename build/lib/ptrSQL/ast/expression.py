@@ -2,14 +2,14 @@ import abc
 from abc import ABC
 from typing import *
 
-from src.ptrSQL.generic import *
-from src.ptrSQL.parser.streams import *
-from src.ptrSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import Ast, FromSQL
 
 if TYPE_CHECKING:
-    from src.ptrSQL.engine.types import *
-    from src.ptrSQL.engine.context import Context
+    from ptrSQL.engine.types import *
+    from ptrSQL.engine.context import Context
 
 __all__ = [
     'Expression',

@@ -1,6 +1,6 @@
 from typing import *
 
-from src.ptrSQL.parser.tokens import Identifier
+from ptrSQL.parser.tokens import Identifier
 from .row_set import RowSet
 from ..column import Column
 from ..row import Row

@@ -7,8 +7,8 @@ try:
 except NameError:
     from typing.io import TextIO
 
-from dropSQL.ast import ExpressionLiteral
-from dropSQL.engine.row_set import *
+from ptrSQL.ast import ExpressionLiteral
+from ptrSQL.engine.row_set import *
 from .formatter import Formatter
 
 __all__ = ['PrettyFormatter']

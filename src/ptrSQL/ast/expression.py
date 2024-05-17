@@ -1,14 +1,15 @@
 import abc
+from abc import ABC
 from typing import *
 
-from dropSQL.generic import *
-from dropSQL.parser.streams import *
-from dropSQL.parser.tokens import *
+from ptrSQL.generic import *
+from ptrSQL.parser.streams import *
+from ptrSQL.parser.tokens import *
 from .ast import Ast, FromSQL
 
 if TYPE_CHECKING:
-    from dropSQL.engine.types import *
-    from dropSQL.engine.context import Context
+    from ptrSQL.engine.types import *
+    from ptrSQL.engine.context import Context
 
 __all__ = [
     'Expression',
@@ -38,17 +39,20 @@ class Expression(Ast, FromSQL['Expression'], metaclass=abc.ABCMeta):
             ;
         """
         res = cls.parse_no_binary(tokens)
-        if not res: return IErr(res.err())
+        if not res:
+            return IErr(res.err())
         lhs = res.ok()
 
         # try binary operator
-        t = tokens.peek().and_then(Cast(Operator))
-        if not t: return IOk(lhs)
+        t = tokens.peek().and_then(cast(Operator))
+        if not t:
+            return IOk(lhs)
         op = t.ok()
         tokens.next()
 
         res = cls.from_sql(tokens)
-        if not res: return IErr(res.err().empty_to_incomplete())
+        if not res:
+            return IErr(res.err().empty_to_incomplete())
         rhs = res.ok()
 
         return IOk(ExpressionBinary(op, lhs, rhs))
@@ -56,7 +60,8 @@ class Expression(Ast, FromSQL['Expression'], metaclass=abc.ABCMeta):
     @classmethod
     def parse_no_binary(cls, tokens: Stream[Token]) -> IResult['Expression']:
         t = tokens.next()
-        if not t: return IErr(t.err().empty_to_incomplete())
+        if not t:
+            return IErr(t.err().empty_to_incomplete())
 
         tok = t.ok()
         if isinstance(tok, Integer):
@@ -72,7 +77,7 @@ class Expression(Ast, FromSQL['Expression'], metaclass=abc.ABCMeta):
             return IOk(ExpressionPlaceholder(tok.index))
 
         if isinstance(tok, Identifier):
-            t = tokens.peek().and_then(Cast(Identifier))
+            t = tokens.peek().and_then(cast(Identifier))
             if t:
                 tokens.next()
                 return IOk(ExpressionReference(tok, t.ok()))
@@ -82,10 +87,12 @@ class Expression(Ast, FromSQL['Expression'], metaclass=abc.ABCMeta):
 
         if isinstance(tok, LParen):
             expr = cls.from_sql(tokens)
-            if not expr: return IErr(expr.err().empty_to_incomplete())
+            if not expr:
+                return IErr(expr.err().empty_to_incomplete())
 
-            t = tokens.next().and_then(Cast(RParen))
-            if not t: return IErr(t.err().empty_to_incomplete())
+            t = tokens.next().and_then(cast(RParen))
+            if not t:
+                return IErr(t.err().empty_to_incomplete())
 
             return IOk(ExpressionParen(expr.ok()))
 
@@ -102,7 +109,7 @@ class Expression(Ast, FromSQL['Expression'], metaclass=abc.ABCMeta):
 PrimitiveTy = TypeVar('PrimitiveTy', int, float, str)
 
 
-class ExpressionLiteral(Expression, Generic[PrimitiveTy]):
+class ExpressionLiteral(Expression, Generic[PrimitiveTy], ABC):
     def __init__(self, lit: PrimitiveTy) -> None:
         super().__init__()
 
@@ -170,7 +177,8 @@ class ExpressionPlaceholder(Expression):
         return f'?{self.index}'
 
     def eval_with(self, context: 'Context') -> Result['DB_TYPE', str]:
-        if len(context.args) <= (self.index - 1): return Err(f'Not enough arguments')
+        if len(context.args) <= (self.index - 1):
+            return Err(f'Not enough arguments')
         lit: DB_TYPE = context.args[self.index - 1]
         return Ok(lit)
 
@@ -242,11 +250,13 @@ class ExpressionBinary(Expression):
 
     def eval_with(self, context: 'Context') -> Result['DB_TYPE', str]:
         lhs = self.lhs.eval_with(context)
-        if not lhs: return Err(lhs.err())
+        if not lhs:
+            return Err(lhs.err())
         lhs = lhs.ok()
 
         rhs = self.rhs.eval_with(context)
-        if not rhs: return Err(rhs.err())
+        if not rhs:
+            return Err(rhs.err())
         rhs = rhs.ok()
 
         op = self.operator.operator

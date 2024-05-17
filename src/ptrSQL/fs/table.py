@@ -1,11 +1,11 @@
 import struct
 from typing import *
 
-from dropSQL.ast.column_def import ColumnDef
-from dropSQL.ast.ty import *
-from dropSQL.engine.types import *
-from dropSQL.generic import *
-from dropSQL.parser.tokens import Identifier
+from ptrSQL.ast.column_def import ColumnDef
+from ptrSQL.ast.ty import *
+from ptrSQL.engine.types import *
+from ptrSQL.generic import *
+from ptrSQL.parser.tokens import Identifier
 from .block import *
 from .block_storage import BlockStorage
 
@@ -87,7 +87,8 @@ class Descriptor:
             return Descriptor(table, block, table_name, pointers, records, columns)
 
     def save(self) -> Result[None, str]:
-        if self.table.descriptor() is not self: return Err('Descriptor is outdated')
+        if self.table.descriptor() is not self:
+            return Err('Descriptor is outdated')
 
         block = self.block
         i = 0  # insertion pointer
@@ -297,7 +298,8 @@ class Table:
         index -= LVL0
 
         lvl1 = self.descriptor().pointers[DIRECT_POINTERS]  # next after direct pointers
-        if lvl1 == 0: return 0
+        if lvl1 == 0:
+            return 0
         block = self.storage.read_block(lvl1)
 
         lvl0 = block.get_pointer(index)
@@ -308,11 +310,13 @@ class Table:
         index -= LVL1
 
         lvl2 = self.descriptor().pointers[DIRECT_POINTERS + 1]  # second after direct pointers
-        if lvl2 == 0: return 0
+        if lvl2 == 0:
+            return 0
         block = self.storage.read_block(lvl2)
 
         lvl1 = block.get_pointer(index // POINTERS_PER_LVL1)
-        if lvl1 == 0: return 0
+        if lvl1 == 0:
+            return 0
         block = self.storage.read_block(lvl1)
 
         lvl0 = block.get_pointer(index % POINTERS_PER_LVL1)
@@ -323,15 +327,18 @@ class Table:
         index -= LVL2
 
         lvl3 = self.descriptor().pointers[DIRECT_POINTERS + 2]  # third after direct pointers
-        if lvl3 == 0: return 0
+        if lvl3 == 0:
+            return 0
         block = self.storage.read_block(lvl3)
 
         lvl2 = block.get_pointer(index // POINTERS_PER_LVL2)
-        if lvl2 == 0: return 0
+        if lvl2 == 0:
+            return 0
         block = self.storage.read_block(lvl2)
 
         lvl1 = block.get_pointer(index // POINTERS_PER_LVL1)
-        if lvl1 == 0: return 0
+        if lvl1 == 0:
+            return 0
         block = self.storage.read_block(lvl1)
 
         lvl0 = block.get_pointer(index % POINTERS_PER_LVL1)
@@ -441,13 +448,15 @@ class Table:
         :return: Ok(record id) or Err(error description)
         """
         res = self._validate_insert_values(values)
-        if not res: return Err(res.err())
+        if not res:
+            return Err(res.err())
         record = self._encode_record(values)
 
         if record_num > self.count_records():
             return Err('record_num({}) > #records({})'.format(record_num, self.count_records()))
 
-        if record_num == -1: record_num = self._increment_record_counter()
+        if record_num == -1:
+            record_num = self._increment_record_counter()
 
         self._write_record(record, record_num)
 
@@ -460,7 +469,8 @@ class Table:
         binary = self._read_record(record_num)
 
         res = self._decode_record(binary)
-        if not res: return Err(res.err())
+        if not res:
+            return Err(res.err())
         row = res.ok()
 
         return Ok(row)
@@ -520,14 +530,17 @@ class Table:
         except struct.error as e:
             return Err(str(e))
 
-        if data[0] == b'd': return Err('Record is dead')
-        if data[0] != b'a': return Err('Incorrect record: {}'.format(data))
+        if data[0] == b'd':
+            return Err('Record is dead')
+        if data[0] != b'a':
+            return Err('Incorrect record: {}'.format(data))
 
         if len(data) - 1 != len(self.get_columns()):
             return Err('record({}) != #columns({})'.format(len(data) - 1, len(self.get_columns())))
 
         r = bytes_to_str(list(data[1:]))
-        if not r: return Err(r.err())
+        if not r:
+            return Err(r.err())
         return Ok(r.ok())
 
     def _encode_record(self, values: ROW_TYPE):
